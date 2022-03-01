@@ -35,8 +35,8 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
         MusicModel musicModel = data.get(position);
 
         View view = holder.getView();
-        TextView tvName = view.findViewById(R.id.tvNameOfSong);
-        tvName.setText(musicModel.getNameOfSong());
+        TextView tvNameOfSong = view.findViewById(R.id.tvNameOfSong);
+        tvNameOfSong.setText(musicModel.getNameOfSong());
 
     }
 
@@ -45,7 +45,7 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
         return data.size();
     }
 
-    class MusicViewHolder extends RecyclerView.ViewHolder {
+    static class MusicViewHolder extends RecyclerView.ViewHolder {
 
         private View view;
         public MusicViewHolder(@NonNull View itemView) {
