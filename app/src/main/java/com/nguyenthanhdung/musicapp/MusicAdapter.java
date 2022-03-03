@@ -15,12 +15,14 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
 
     private List<MusicModel> data = new ArrayList<>();
 
-    public MusicAdapter() {
-
+    private Callback callback;
+    public MusicAdapter(Callback callback) {
+        this.callback=callback;
     }
 
     public void setData(List<MusicModel> data) {
         this.data = data;
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -38,6 +40,12 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
         TextView tvNameOfSong = view.findViewById(R.id.tvNameOfSong);
         tvNameOfSong.setText(musicModel.getNameOfSong());
 
+        view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                callback.onClickItem(holder.getAdapterPosition());
+            }
+        });
     }
 
     @Override
@@ -57,5 +65,8 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
         }
     }
 
+    interface Callback{
+        void onClickItem(int position);
+    }
 
 }

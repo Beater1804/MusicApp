@@ -1,5 +1,10 @@
 package com.nguyenthanhdung.musicapp;
 
+import static com.nguyenthanhdung.musicapp.MusicPlayerService.ACTION_LOAD_MUSIC_DONE;
+import static com.nguyenthanhdung.musicapp.MusicPlayerService.ACTION_PLAY_MUSIC;
+import static com.nguyenthanhdung.musicapp.MusicPlayerService.ACTION_START_LOAD_MUSIC;
+import static com.nguyenthanhdung.musicapp.MusicPlayerService.SONG_POSITION_KEY;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -8,16 +13,19 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
-import android.util.Log;
+import android.os.Environment;
 import android.view.View;
 import android.widget.ProgressBar;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -25,6 +33,8 @@ public class MainActivity extends AppCompatActivity {
 
     private MusicAdapter musicAdapter;
     private ProgressBar progressBar;
+
+    private LoadMusicDoneReceiver loadMusicDoneReceiver = new LoadMusicDoneReceiver();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +44,22 @@ public class MainActivity extends AppCompatActivity {
         setupView();
 //        loadMusicList();
         checkPermission();
+        registerReceiver();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unRegisterReceiver();
+    }
+
+    private void registerReceiver() {
+        IntentFilter intentFilter = new IntentFilter(ACTION_LOAD_MUSIC_DONE);
+        registerReceiver(loadMusicDoneReceiver, intentFilter);
+    }
+
+    private void unRegisterReceiver() {
+        unregisterReceiver(loadMusicDoneReceiver);
     }
 
     private void setupView() {
@@ -42,7 +68,12 @@ public class MainActivity extends AppCompatActivity {
         RecyclerView recyclerView = findViewById(R.id.rvListOfSong);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
-        musicAdapter = new MusicAdapter();
+        musicAdapter = new MusicAdapter(new MusicAdapter.Callback() {
+            @Override
+            public void onClickItem(int position) {
+                onClickSong(position);
+            }
+        });
         recyclerView.setAdapter(musicAdapter);
     }
 
@@ -75,29 +106,27 @@ public class MainActivity extends AppCompatActivity {
 
     public void loadMusicList() {
         progressBar.setVisibility(View.VISIBLE);
-        Uri allOfSongUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-        String selection = MediaStore.Audio.Media.IS_MUSIC + " != 0";
+        Intent intent = new Intent(this, MusicPlayerService.class);
+        intent.setAction(ACTION_START_LOAD_MUSIC);
+        startService(intent);
 
-        List<MusicModel> data = new ArrayList<>();
 
-        Cursor cursor = getContentResolver().query(allOfSongUri, null, null, null, selection);
+    }
 
-        if (cursor.moveToFirst()) {
-            do {
-                String nameOfSong = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME));
-//                int songId = cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID));
 
-                String url = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA));
-                String duration = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION));
+    public void onClickSong(int position) {
+        Intent intent = new Intent(this, MusicPlayerService.class);
+        intent.setAction(ACTION_PLAY_MUSIC);
+        intent.putExtra(MusicPlayerService.SONG_POSITION_KEY, position);
+        startService(intent);
+    }
 
-                MusicModel musicModel = new MusicModel(nameOfSong, null, url, null, Long.valueOf(duration));
-                data.add(musicModel);
-            } while (cursor.moveToNext());
-
+    class LoadMusicDoneReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            progressBar.setVisibility(View.GONE);
+            musicAdapter.setData(MusicPlayerService.musicModels);
         }
-        cursor.close();
-        progressBar.setVisibility(View.GONE);
-        musicAdapter.setData(data);
     }
 
 }

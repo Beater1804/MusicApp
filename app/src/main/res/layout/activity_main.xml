@@ -9,7 +9,9 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvListOfSong"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@id/smallMusicPlay"
+        app:layout_constraintTop_toTopOf="parent"
         tools:listitem="@layout/item_song"/>
 
     <ProgressBar
@@ -22,4 +24,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         tools:visibility="visible"/>
+
+    <FrameLayout
+        android:id="@+id/smallMusicPlay"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/small_music_play_height"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 </androidx.constraintlayout.widget.ConstraintLayout>
