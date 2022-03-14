@@ -1,15 +1,18 @@
 package com.nguyenthanhdung.musicapp;
 
-public class MusicModel {
+import java.io.Serializable;
+import java.text.SimpleDateFormat;
+
+public class MusicModel implements Serializable {
     private String nameOfSong;
-    private String album;
+    private String artist;
     private String url;
     private String thumbnailUrl;
     private long duration;
 
-    public MusicModel(String nameOfSong, String album, String url, String thumbnailUrl, long duration) {
+    public MusicModel(String nameOfSong, String artist, String url, String thumbnailUrl, long duration) {
         this.nameOfSong = nameOfSong;
-        this.album = album;
+        this.artist = artist;
         this.url = url;
         this.thumbnailUrl = thumbnailUrl;
         this.duration = duration;
@@ -19,8 +22,8 @@ public class MusicModel {
         return nameOfSong;
     }
 
-    public String getAlbum() {
-        return album;
+    public String getArtist() {
+        return artist;
     }
 
     public String getUrl() {
@@ -33,5 +36,11 @@ public class MusicModel {
 
     public long getDuration() {
         return duration;
+    }
+
+    public String getDurationFormat(int duration) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("mm:ss");
+        String timeText = simpleDateFormat.format(duration);
+        return timeText;
     }
 }

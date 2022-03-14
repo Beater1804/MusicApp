@@ -38,7 +38,16 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
 
         View view = holder.getView();
         TextView tvNameOfSong = view.findViewById(R.id.tvNameOfSong);
+        tvNameOfSong.setSelected(true);
         tvNameOfSong.setText(musicModel.getNameOfSong());
+
+        TextView tvArtist = view.findViewById(R.id.tvArtist);
+        tvArtist.setText(musicModel.getArtist());
+
+        TextView tvDuration = view.findViewById(R.id.tvDuration);
+        tvDuration.setText(musicModel.getDurationFormat((int)musicModel.getDuration()));
+
+
 
         view.setOnClickListener(new View.OnClickListener() {
             @Override
